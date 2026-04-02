@@ -1,0 +1,17 @@
+# ── Builder stage ──
+FROM rust:1.88-bookworm AS builder
+
+WORKDIR /app
+COPY . .
+RUN cargo build --release
+
+# ── Runtime stage ──
+FROM debian:bookworm-slim
+
+RUN apt-get update && apt-get install -y libpq5 ca-certificates && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /app/target/release/reactor-api /usr/local/bin/reactor-api
+
+EXPOSE 8080
+
+CMD ["reactor-api"]

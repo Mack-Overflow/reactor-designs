@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: reactor
+      POSTGRES_PASSWORD: reactor
+      POSTGRES_DB: reactor_sim
+    ports:
+      - "54322:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U reactor -d reactor_sim"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    env_file: .env
+    volumes:
+      - ./api:/app
+      - cargo-cache:/usr/local/cargo/registry
+      - target-cache:/app/target
+    depends_on:
+      db:
+        condition: service_healthy
+
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=${VITE_API_URL}
+    volumes:
+      - ./ui:/app
+      - /app/node_modules
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+  cargo-cache:
+  target-cache:
