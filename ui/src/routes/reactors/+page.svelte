@@ -35,10 +35,13 @@
 	let designTypes = $derived([...new Set(reactors.map((r) => r.design_type))].sort());
 </script>
 
-<h1>Reactor Designs</h1>
+<div class="page-header">
+	<h1>Reactor Designs</h1>
+	<p class="count">{loading ? '...' : filtered.length} designs</p>
+</div>
 
 <div class="filters">
-	<input type="text" placeholder="Search by name, vendor, coolant..." bind:value={search} />
+	<input type="text" placeholder="Search..." bind:value={search} />
 	<select bind:value={typeFilter}>
 		<option value="">All types</option>
 		{#each designTypes as dt}
@@ -48,73 +51,78 @@
 </div>
 
 {#if loading}
-	<p class="status">Loading reactors...</p>
+	<p class="status">Loading...</p>
 {:else if error}
 	<p class="status error">{error}</p>
 {:else if filtered.length === 0}
 	<p class="status">No reactors found.</p>
 {:else}
-	<div class="grid">
+	<div class="table-wrap">
+		<div class="table-header">
+			<span class="col-type">Type</span>
+			<span class="col-name">Name</span>
+			<span class="col-vendor">Vendor</span>
+			<span class="col-thermal">Thermal</span>
+			<span class="col-electric">Electric</span>
+			<span class="col-coolant">Coolant</span>
+			<span class="col-fuel">Fuel</span>
+		</div>
 		{#each filtered as reactor}
-			<a href="/reactors/{reactor.id}" class="card">
-				<div class="card-header">
-					<span class="badge">{reactor.design_type}</span>
-					<h2>{reactor.name}</h2>
-					{#if reactor.vendor}
-						<span class="vendor">{reactor.vendor}</span>
-					{/if}
-				</div>
-				<div class="specs">
-					{#if reactor.thermal_power_mw}
-						<div class="spec">
-							<span class="spec-label">Thermal</span>
-							<span class="spec-value">{reactor.thermal_power_mw} MW</span>
-						</div>
-					{/if}
-					{#if reactor.electric_power_mw}
-						<div class="spec">
-							<span class="spec-label">Electric</span>
-							<span class="spec-value">{reactor.electric_power_mw} MW</span>
-						</div>
-					{/if}
-					{#if reactor.coolant_type}
-						<div class="spec">
-							<span class="spec-label">Coolant</span>
-							<span class="spec-value">{reactor.coolant_type}</span>
-						</div>
-					{/if}
-					{#if reactor.fuel_type}
-						<div class="spec">
-							<span class="spec-label">Fuel</span>
-							<span class="spec-value">{reactor.fuel_type}</span>
-						</div>
-					{/if}
-				</div>
+			<a href="/reactors/{reactor.id}" class="table-row">
+				<span class="col-type">
+					<span class="type-badge">{reactor.design_type}</span>
+				</span>
+				<span class="col-name">{reactor.name}</span>
+				<span class="col-vendor">{reactor.vendor ?? '--'}</span>
+				<span class="col-thermal mono">{reactor.thermal_power_mw ?? '--'} <small>MW</small></span>
+				<span class="col-electric mono"
+					>{reactor.electric_power_mw ?? '--'} <small>MW</small></span
+				>
+				<span class="col-coolant">{reactor.coolant_type ?? '--'}</span>
+				<span class="col-fuel">{reactor.fuel_type ?? '--'}</span>
 			</a>
 		{/each}
 	</div>
 {/if}
 
 <style>
+	.page-header {
+		display: flex;
+		align-items: baseline;
+		gap: 1rem;
+		margin-bottom: 2rem;
+	}
+
 	h1 {
-		font-size: 1.75rem;
-		margin-bottom: 1.5rem;
+		font-size: 2rem;
+		font-weight: 800;
+		letter-spacing: -0.03em;
+		margin: 0;
+	}
+
+	.count {
+		font-size: 0.8rem;
+		color: rgba(255, 255, 255, 0.3);
+		margin: 0;
+		font-family: 'JetBrains Mono', monospace;
 	}
 
 	.filters {
 		display: flex;
-		gap: 0.75rem;
-		margin-bottom: 1.5rem;
+		gap: 1px;
+		background: rgba(255, 255, 255, 0.1);
+		margin-bottom: 2rem;
 	}
 
 	input,
 	select {
-		background: #1e293b;
-		border: 1px solid #334155;
-		color: #e2e8f0;
-		padding: 0.5rem 0.75rem;
-		border-radius: 6px;
-		font-size: 0.9rem;
+		background: #000;
+		border: none;
+		color: #fff;
+		padding: 0.8rem 1rem;
+		font-size: 0.85rem;
+		font-family: 'Inter', sans-serif;
+		outline: none;
 	}
 
 	input {
@@ -122,86 +130,155 @@
 	}
 
 	input::placeholder {
-		color: #64748b;
+		color: rgba(255, 255, 255, 0.25);
+	}
+
+	select {
+		min-width: 140px;
+		cursor: pointer;
 	}
 
 	.status {
-		color: #94a3b8;
+		color: rgba(255, 255, 255, 0.4);
 	}
 
 	.error {
-		color: #f87171;
+		color: #ff3366;
 	}
 
-	.grid {
+	.table-wrap {
+		border: 1px solid rgba(255, 255, 255, 0.06);
+	}
+
+	.table-header {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-		gap: 1rem;
+		grid-template-columns: 80px 1.5fr 1fr 0.8fr 0.8fr 1fr 1fr;
+		gap: 0;
+		padding: 0.75rem 1.25rem;
+		font-size: 0.65rem;
+		font-weight: 600;
+		letter-spacing: 0.15em;
+		text-transform: uppercase;
+		color: rgba(255, 255, 255, 0.25);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 	}
 
-	.card {
-		background: #1e293b;
-		border: 1px solid #334155;
-		border-radius: 8px;
-		padding: 1.25rem;
+	.table-row {
+		display: grid;
+		grid-template-columns: 80px 1.5fr 1fr 0.8fr 0.8fr 1fr 1fr;
+		gap: 0;
+		padding: 1rem 1.25rem;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 		text-decoration: none;
-		color: inherit;
-		transition:
-			border-color 0.2s,
-			transform 0.2s;
-	}
-
-	.card:hover {
-		border-color: #38bdf8;
-		transform: translateY(-2px);
-	}
-
-	.card-header {
-		margin-bottom: 1rem;
-	}
-
-	.badge {
-		display: inline-block;
-		background: #38bdf8;
-		color: #0f172a;
-		font-size: 0.7rem;
-		font-weight: 700;
-		padding: 0.15rem 0.5rem;
-		border-radius: 4px;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
-
-	h2 {
-		font-size: 1.15rem;
-		margin: 0.5rem 0 0.15rem;
-	}
-
-	.vendor {
+		color: #fff;
 		font-size: 0.85rem;
-		color: #94a3b8;
+		transition: background 0.2s;
+		align-items: center;
 	}
 
-	.specs {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 0.5rem;
+	.table-row:hover {
+		background: rgba(255, 255, 255, 0.03);
 	}
 
-	.spec {
-		display: flex;
-		flex-direction: column;
+	.table-row:last-child {
+		border-bottom: none;
 	}
 
-	.spec-label {
-		font-size: 0.7rem;
-		color: #64748b;
+	.type-badge {
+		display: inline-block;
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		padding: 0.15rem 0.45rem;
+		font-size: 0.65rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
 	}
 
-	.spec-value {
-		font-size: 0.9rem;
-		color: #e2e8f0;
+	.col-vendor,
+	.col-coolant,
+	.col-fuel {
+		color: rgba(255, 255, 255, 0.5);
+	}
+
+	.mono,
+	:global(.mono) {
+		font-family: 'JetBrains Mono', monospace;
+	}
+
+	small {
+		color: rgba(255, 255, 255, 0.25);
+		font-size: 0.7rem;
+	}
+
+	@media (max-width: 900px) {
+		.table-header {
+			display: none;
+		}
+
+		.table-row {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem 1rem;
+			padding: 1rem;
+			align-items: baseline;
+		}
+
+		.col-type {
+			order: 0;
+		}
+
+		.col-name {
+			order: 1;
+			flex: 1;
+			min-width: 0;
+			font-weight: 600;
+		}
+
+		.col-vendor {
+			order: 2;
+			width: 100%;
+			font-size: 0.75rem;
+		}
+
+		.col-thermal,
+		.col-electric {
+			font-size: 0.8rem;
+		}
+
+		.col-coolant,
+		.col-fuel {
+			font-size: 0.75rem;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.page-header {
+			flex-direction: column;
+			gap: 0.25rem;
+			margin-bottom: 1.25rem;
+		}
+
+		h1 {
+			font-size: 1.5rem;
+		}
+
+		.filters {
+			flex-direction: column;
+			gap: 0;
+			margin-bottom: 1.25rem;
+		}
+
+		select {
+			min-width: auto;
+		}
+
+		.table-row {
+			padding: 0.85rem;
+		}
+
+		.col-coolant,
+		.col-fuel {
+			display: none;
+		}
 	}
 </style>

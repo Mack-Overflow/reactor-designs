@@ -4,7 +4,7 @@ INSERT INTO reactor_designs (name, design_type, vendor, thermal_power_mw, electr
     'EBR-II',
     'Oklo Inc.',
     62.5,
-    75,
+    20,
     'Liquid Sodium',
     'None',
     'HALEU',
