@@ -2,6 +2,7 @@
 	import { apiFetch } from '$lib/api';
 	import type { ReactorDesign, LaunchResponse, CompareEntry } from '$lib/types';
 	import TimeSeriesChart from '$lib/components/TimeSeriesChart.svelte';
+	import { exportComparisonPdf } from '$lib/export-pdf';
 
 	let reactors = $state<ReactorDesign[]>([]);
 	let loading = $state(true);
@@ -102,6 +103,32 @@
 			data: entry.results.map((r) => Number(r[field] ?? 0))
 		}));
 	}
+
+	function handleExportComparison() {
+		if (!compareData) return;
+		exportComparisonPdf({
+			entries: compareData.map((entry) => {
+				const last = entry.results[entry.results.length - 1] ?? null;
+				return {
+					reactorName: entry.reactor_name,
+					reactorType: entry.reactor_design_type,
+					finalStep: last ? {
+						time_years: Number(last.time_years ?? 0),
+						fuel_burnup_gwd_t: Number(last.fuel_burnup_gwd_t ?? 0),
+						fuel_remaining_pct: Number(last.fuel_remaining_pct ?? 0),
+						coolant_temp_inlet_c: Number(last.coolant_temp_inlet_c ?? 0),
+						coolant_temp_outlet_c: Number(last.coolant_temp_outlet_c ?? 0),
+						thermal_power_mw: Number(last.thermal_power_mw ?? 0),
+						electric_power_mw: Number(last.electric_power_mw ?? 0),
+						capacity_factor: Number(last.capacity_factor ?? 0),
+						waste_actinides_kg: Number(last.waste_actinides_kg ?? 0),
+						waste_fission_products_kg: Number(last.waste_fission_products_kg ?? 0),
+						waste_total_activity_bq: Number(last.waste_total_activity_bq ?? 0),
+					} : null,
+				};
+			}),
+		});
+	}
 </script>
 
 <h1>Compare Designs</h1>
@@ -152,6 +179,9 @@
 	{/if}
 
 	{#if compareData}
+		<div class="compare-actions">
+			<button class="btn-export" onclick={handleExportComparison}>Export PDF</button>
+		</div>
 		<div class="charts">
 			<TimeSeriesChart labels={timeLabels} datasets={metricDatasets('fuel_burnup_gwd_t')} title="Fuel Burnup" yLabel="GWd/t" />
 			<TimeSeriesChart labels={timeLabels} datasets={metricDatasets('coolant_temp_outlet_c')} title="Outlet Temperature" yLabel="deg C" />
@@ -305,6 +335,28 @@
 
 	.status {
 		color: rgba(255, 255, 255, 0.4);
+	}
+
+	.compare-actions {
+		margin-bottom: 1.5rem;
+	}
+
+	.btn-export {
+		background: #fff;
+		color: #000;
+		border: none;
+		padding: 0.65rem 1.5rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		font-family: 'Inter', sans-serif;
+		cursor: pointer;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		transition: all 0.2s;
+	}
+
+	.btn-export:hover {
+		background: rgba(255, 255, 255, 0.85);
 	}
 
 	.charts {

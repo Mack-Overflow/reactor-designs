@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import TimeSeriesChart from '$lib/components/TimeSeriesChart.svelte';
+	import { exportSimulationPdf } from '$lib/export-pdf';
 
 	const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:18080';
 
@@ -28,6 +29,7 @@
 	let status = $state<'connecting' | 'streaming' | 'completed' | 'error'>('connecting');
 	let errorMsg = $state('');
 	let averageCf = $state(0);
+	let launchPayload = $state<Record<string, unknown>>({});
 
 	let timeLabels = $derived(steps.map((s) => s.time_years.toFixed(2)));
 
@@ -61,6 +63,18 @@
 	// Derive live stats from latest step
 	let latest = $derived(steps.length > 0 ? steps[steps.length - 1] : null);
 
+	function handleExport() {
+		const params = launchPayload.params as Record<string, unknown> ?? {};
+		exportSimulationPdf({
+			reactorName: String(params.reactor_name ?? 'Reactor'),
+			reactorType: String(params.reactor_type ?? ''),
+			runId,
+			averageCf,
+			params,
+			steps,
+		});
+	}
+
 	onMount(() => {
 		const raw = sessionStorage.getItem('sim_launch');
 		if (!raw) {
@@ -69,6 +83,7 @@
 		}
 		sessionStorage.removeItem('sim_launch');
 		const payload = JSON.parse(raw);
+		launchPayload = payload;
 		startStream(payload);
 	});
 
@@ -164,6 +179,13 @@
 				<span class="separator">&bull;</span>
 				<a href="/simulate/{runId}" class="run-link">{runId.slice(0, 8)}</a>
 			{/if}
+		</div>
+	{/if}
+
+	{#if status === 'completed'}
+		<div class="completed-actions">
+			<button class="btn-export" onclick={handleExport}>Export PDF</button>
+			<a href="/simulate" class="btn-again">Run Again</a>
 		</div>
 	{/if}
 </div>
@@ -273,6 +295,50 @@
 
 	.run-link:hover {
 		color: #fff;
+	}
+
+	.completed-actions {
+		display: flex;
+		gap: 0.75rem;
+		margin-top: 1.25rem;
+	}
+
+	.btn-export {
+		background: #fff;
+		color: #000;
+		border: none;
+		padding: 0.65rem 1.5rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		font-family: 'Inter', sans-serif;
+		cursor: pointer;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		transition: all 0.2s;
+	}
+
+	.btn-export:hover {
+		background: rgba(255, 255, 255, 0.85);
+	}
+
+	.btn-again {
+		display: inline-flex;
+		align-items: center;
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		color: rgba(255, 255, 255, 0.6);
+		padding: 0.65rem 1.5rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		font-family: 'Inter', sans-serif;
+		text-decoration: none;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		transition: all 0.2s;
+	}
+
+	.btn-again:hover {
+		color: #fff;
+		border-color: rgba(255, 255, 255, 0.4);
 	}
 
 	.error-box {

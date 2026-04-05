@@ -16,7 +16,7 @@
 </script>
 
 <section class="hero">
-	<p class="eyebrow">Nuclear Simulation Platform</p>
+	<p class="eyebrow">Reactor Simulation Platform</p>
 	<h1>
 		Model the future<br />
 		of <span class="highlight">nuclear energy</span>

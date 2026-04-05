@@ -10,6 +10,7 @@
 	let error = $state('');
 
 	let selectedReactorId = $state('');
+	let mobilePhase = $state<1 | 2>(1);
 	let durationYears = $state(5);
 	let timeStepDays = $state(30);
 	let initialHeavyMetalTonnes = $state(60);
@@ -191,6 +192,8 @@
 		const launchPayload = {
 			reactor_id: selectedReactorId,
 			params: {
+				reactor_name: selectedReactor.name,
+				reactor_type: selectedReactor.design_type,
 				duration_years: durationYears,
 				time_step_days: timeStepDays,
 				initial_heavy_metal_tonnes: initialHeavyMetalTonnes,
@@ -219,28 +222,34 @@
 	<p class="status">Loading reactors…</p>
 {:else}
 	<form onsubmit={(e) => { e.preventDefault(); launch(); }}>
-		<section class="section">
-			<h2>01 &mdash; Select Reactor</h2>
-			<div class="reactor-selector">
-				{#each reactors as r}
-					<button
-						type="button"
-						class="reactor-option"
-						class:selected={selectedReactorId === r.id}
-						onclick={() => (selectedReactorId = r.id)}
-					>
-						<span class="ro-type">{r.design_type}</span>
-						<span class="ro-name">{r.name}</span>
-						<span class="ro-detail">
-							{r.coolant_type ?? '—'} &middot; {r.fuel_type ?? '—'} &middot; {r.enrichment_pct ?? '?'}% enriched
-						</span>
-						<span class="ro-power mono">{r.thermal_power_mw ?? '?'} MWth &rarr; {r.electric_power_mw ?? '?'} MWe</span>
-					</button>
-				{/each}
-			</div>
-		</section>
+		<div class="phase" class:mobile-hidden={mobilePhase !== 1}>
+			<section class="section">
+				<h2>01 &mdash; Select Reactor</h2>
+				<div class="reactor-selector">
+					{#each reactors as r}
+						<button
+							type="button"
+							class="reactor-option"
+							class:selected={selectedReactorId === r.id}
+							onclick={() => { selectedReactorId = r.id; mobilePhase = 2; }}
+						>
+							<span class="ro-type">{r.design_type}</span>
+							<span class="ro-name">{r.name}</span>
+							<span class="ro-detail">
+								{r.coolant_type ?? '—'} &middot; {r.fuel_type ?? '—'} &middot; {r.enrichment_pct ?? '?'}% enriched
+							</span>
+							<span class="ro-power mono">{r.thermal_power_mw ?? '?'} MWth &rarr; {r.electric_power_mw ?? '?'} MWe</span>
+						</button>
+					{/each}
+				</div>
+			</section>
+		</div>
 
 		{#if selectedReactor}
+		<div class="phase" class:mobile-hidden={mobilePhase !== 2}>
+			<button type="button" class="mobile-back" onclick={() => (mobilePhase = 1)}>
+				&larr; Change Reactor
+			</button>
 			<!-- Reactor context banner -->
 			<div class="reactor-context">
 				<span class="rc-label">Modeling</span>
@@ -439,6 +448,7 @@
 			<button type="submit" class="btn-launch" disabled={submitting}>
 				{submitting ? 'Launching…' : 'Launch Simulation'}
 			</button>
+		</div>
 		{/if}
 	</form>
 {/if}
@@ -762,6 +772,12 @@
 	.status { color: rgba(255, 255, 255, 0.4); }
 	.error { color: #ff3366; margin-bottom: 1rem; }
 
+	/* ── Mobile phase system ─────────────────────────── */
+
+	.mobile-back {
+		display: none;
+	}
+
 	/* ── Responsive ──────────────────────────────────── */
 
 	@media (max-width: 768px) {
@@ -775,5 +791,28 @@
 		.btn-launch { width: 100%; text-align: center; }
 		.section { margin-bottom: 2rem; }
 		.ep-grid { gap: 1.25rem; }
+
+		.mobile-hidden {
+			display: none;
+		}
+
+		.mobile-back {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.35rem;
+			background: none;
+			border: none;
+			color: rgba(255, 255, 255, 0.4);
+			font-size: 0.8rem;
+			font-family: 'Inter', sans-serif;
+			cursor: pointer;
+			padding: 0;
+			margin-bottom: 1.5rem;
+			transition: color 0.2s;
+		}
+
+		.mobile-back:hover {
+			color: #fff;
+		}
 	}
 </style>
