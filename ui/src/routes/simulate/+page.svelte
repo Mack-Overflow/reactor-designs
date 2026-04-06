@@ -147,6 +147,7 @@
 				const preselect = page.url.searchParams.get('reactor');
 				if (preselect && data.some((r) => r.id === preselect)) {
 					selectedReactorId = preselect;
+					mobilePhase = 2;
 				}
 			})
 			.catch((e) => (error = e.message))

@@ -207,7 +207,7 @@
 	</div>
 
 	<div class="actions">
-		<a href="/simulate" class="btn-primary">Simulate Reactor</a>
+		<a href="/simulate?reactor={reactor.id}" class="btn-primary">Simulate Reactor</a>
 	</div>
 
 	<!-- Quick Compare -->

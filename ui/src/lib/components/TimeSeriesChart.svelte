@@ -84,6 +84,12 @@
 				},
 				scales: {
 					x: {
+						title: {
+							display: true,
+							text: 'Time (Years)',
+							color: 'rgba(255,255,255,0.3)',
+							font: { size: 10, family: 'Inter' }
+						},
 						ticks: {
 							color: 'rgba(255,255,255,0.2)',
 							maxTicksLimit: 8,
@@ -104,7 +110,19 @@
 							: { display: false },
 						ticks: {
 							color: 'rgba(255,255,255,0.2)',
-							font: { size: 10, family: 'JetBrains Mono' }
+							font: { size: 10, family: 'JetBrains Mono' },
+							...(logScale ? {
+								maxTicksLimit: 8,
+								callback: (value: number | string) => {
+									const v = Number(value);
+									if (v <= 0) return '';
+									const exp = Math.round(Math.log10(v));
+									if (Math.abs(v - Math.pow(10, exp)) / Math.pow(10, exp) < 0.01) {
+										return `1e${exp}`;
+									}
+									return '';
+								}
+							} : {})
 						},
 						grid: { color: 'rgba(255,255,255,0.04)' },
 						border: { color: 'rgba(255,255,255,0.08)' }
