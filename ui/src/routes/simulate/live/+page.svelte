@@ -148,10 +148,10 @@
 	}
 </script>
 
-<a href="/simulate" class="back">&larr; New Simulation</a>
+<a href="/simulate" class="text-[0.8rem] text-white/30 no-underline transition-colors duration-200 hover:text-white">&larr; New Simulation</a>
 
-<div class="hero">
-	<h1>
+<div class="mt-8 mb-10">
+	<h1 class="text-[clamp(1.5rem,4vw,2.5rem)] font-extrabold tracking-tight m-0 mb-6">
 		{#if status === 'streaming'}
 			Simulation in progress
 		{:else if status === 'completed'}
@@ -164,67 +164,67 @@
 	</h1>
 
 	{#if status === 'streaming' || status === 'completed'}
-		<div class="progress-track">
-			<div class="progress-bar" style="width: {status === 'completed' ? 100 : progressPct}%"></div>
+		<div class="h-0.5 bg-white/6 mb-3 overflow-hidden">
+			<div class="h-full bg-white transition-[width] duration-400 ease-out" style="width: {status === 'completed' ? 100 : progressPct}%"></div>
 		</div>
-		<div class="progress-meta">
-			<span class="mono">{steps.length} / {totalSteps}</span>
+		<div class="flex gap-2 items-center text-xs text-white/35 flex-wrap max-lg:gap-1.5">
+			<span class="font-mono text-white">{steps.length} / {totalSteps}</span>
 			<span>steps</span>
 			{#if status === 'completed'}
-				<span class="separator">&bull;</span>
-				<span class="mono">{averageCf.toFixed(3)}</span>
+				<span class="text-white/15">&bull;</span>
+				<span class="font-mono text-white">{averageCf.toFixed(3)}</span>
 				<span>avg capacity factor</span>
 			{/if}
 			{#if runId}
-				<span class="separator">&bull;</span>
-				<a href="/simulate/{runId}" class="run-link">{runId.slice(0, 8)}</a>
+				<span class="text-white/15">&bull;</span>
+				<a href="/simulate/{runId}" class="text-white/50 no-underline font-mono hover:text-white">{runId.slice(0, 8)}</a>
 			{/if}
 		</div>
 	{/if}
 
 	{#if status === 'completed'}
-		<div class="completed-actions">
-			<button class="btn-export" onclick={handleExport}>Export PDF</button>
-			<a href="/simulate" class="btn-again">Run Again</a>
+		<div class="flex gap-3 mt-5">
+			<button class="btn-primary px-6 py-2.5 text-xs font-bold tracking-mid uppercase" onclick={handleExport}>Export PDF</button>
+			<a href="/simulate" class="btn-outline px-6 py-2.5 text-xs font-semibold tracking-mid uppercase inline-flex items-center">Run Again</a>
 		</div>
 	{/if}
 </div>
 
 {#if status === 'error'}
-	<div class="error-box">{errorMsg}</div>
+	<div class="error-box mb-8">{errorMsg}</div>
 {/if}
 
 {#if latest}
-	<div class="live-stats">
-		<div class="live-stat">
-			<span class="ls-value mono">{latest.thermal_power_mw.toFixed(0)}</span>
-			<span class="ls-label">MW thermal</span>
+	<div class="grid grid-cols-6 grid-divider mb-12 max-lg:grid-cols-3 max-sm:grid-cols-2">
+		<div class="bg-black py-5 px-4 flex flex-col gap-1 max-lg:py-4 max-lg:px-3">
+			<span class="font-mono text-[1.25rem] font-bold text-white max-lg:text-base max-sm:text-[0.9rem]">{latest.thermal_power_mw.toFixed(0)}</span>
+			<span class="text-[0.6rem] uppercase tracking-caps text-white/25 font-medium">MW thermal</span>
 		</div>
-		<div class="live-stat">
-			<span class="ls-value mono">{latest.electric_power_mw.toFixed(0)}</span>
-			<span class="ls-label">MW electric</span>
+		<div class="bg-black py-5 px-4 flex flex-col gap-1 max-lg:py-4 max-lg:px-3">
+			<span class="font-mono text-[1.25rem] font-bold text-white max-lg:text-base max-sm:text-[0.9rem]">{latest.electric_power_mw.toFixed(0)}</span>
+			<span class="text-[0.6rem] uppercase tracking-caps text-white/25 font-medium">MW electric</span>
 		</div>
-		<div class="live-stat">
-			<span class="ls-value mono">{latest.coolant_temp_outlet_c.toFixed(0)}&deg;</span>
-			<span class="ls-label">outlet temp</span>
+		<div class="bg-black py-5 px-4 flex flex-col gap-1 max-lg:py-4 max-lg:px-3">
+			<span class="font-mono text-[1.25rem] font-bold text-white max-lg:text-base max-sm:text-[0.9rem]">{latest.coolant_temp_outlet_c.toFixed(0)}&deg;</span>
+			<span class="text-[0.6rem] uppercase tracking-caps text-white/25 font-medium">outlet temp</span>
 		</div>
-		<div class="live-stat">
-			<span class="ls-value mono">{latest.fuel_burnup_gwd_t.toFixed(1)}</span>
-			<span class="ls-label">GWd/t burnup</span>
+		<div class="bg-black py-5 px-4 flex flex-col gap-1 max-lg:py-4 max-lg:px-3">
+			<span class="font-mono text-[1.25rem] font-bold text-white max-lg:text-base max-sm:text-[0.9rem]">{latest.fuel_burnup_gwd_t.toFixed(1)}</span>
+			<span class="text-[0.6rem] uppercase tracking-caps text-white/25 font-medium">GWd/t burnup</span>
 		</div>
-		<div class="live-stat">
-			<span class="ls-value mono">{(latest.fuel_remaining_pct * 100).toFixed(1)}%</span>
-			<span class="ls-label">fuel remaining</span>
+		<div class="bg-black py-5 px-4 flex flex-col gap-1 max-lg:py-4 max-lg:px-3">
+			<span class="font-mono text-[1.25rem] font-bold text-white max-lg:text-base max-sm:text-[0.9rem]">{(latest.fuel_remaining_pct * 100).toFixed(1)}%</span>
+			<span class="text-[0.6rem] uppercase tracking-caps text-white/25 font-medium">fuel remaining</span>
 		</div>
-		<div class="live-stat">
-			<span class="ls-value mono">{latest.waste_total_activity_bq.toExponential(2)}</span>
-			<span class="ls-label">Bq activity</span>
+		<div class="bg-black py-5 px-4 flex flex-col gap-1 max-lg:py-4 max-lg:px-3">
+			<span class="font-mono text-[1.25rem] font-bold text-white max-lg:text-base max-sm:text-[0.9rem]">{latest.waste_total_activity_bq.toExponential(2)}</span>
+			<span class="text-[0.6rem] uppercase tracking-caps text-white/25 font-medium">Bq activity</span>
 		</div>
 	</div>
 {/if}
 
 {#if steps.length > 0}
-	<div class="charts">
+	<div class="chart-grid-auto max-lg:grid-cols-1">
 		<TimeSeriesChart labels={timeLabels} datasets={burnupData} title="Fuel Burnup" yLabel="GWd/t" />
 		<TimeSeriesChart labels={timeLabels} datasets={tempData} title="Coolant Temperature" yLabel="deg C" />
 		<TimeSeriesChart labels={timeLabels} datasets={powerData} title="Power Output" yLabel="MW" />
@@ -233,189 +233,3 @@
 		<TimeSeriesChart labels={timeLabels} datasets={activityData} title="Radioactivity" yLabel="Bq" logScale={true} />
 	</div>
 {/if}
-
-<style>
-	.back {
-		font-size: 0.8rem;
-		color: rgba(255, 255, 255, 0.3);
-		text-decoration: none;
-		transition: color 0.2s;
-	}
-
-	.back:hover {
-		color: #fff;
-	}
-
-	.hero {
-		margin: 2rem 0 2.5rem;
-	}
-
-	h1 {
-		font-size: clamp(1.5rem, 4vw, 2.5rem);
-		font-weight: 800;
-		letter-spacing: -0.03em;
-		margin: 0 0 1.5rem;
-	}
-
-	.progress-track {
-		height: 2px;
-		background: rgba(255, 255, 255, 0.06);
-		margin-bottom: 0.75rem;
-		overflow: hidden;
-	}
-
-	.progress-bar {
-		height: 100%;
-		background: #fff;
-		transition: width 0.4s ease;
-	}
-
-	.progress-meta {
-		display: flex;
-		gap: 0.5rem;
-		align-items: center;
-		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.35);
-	}
-
-	.mono {
-		font-family: 'JetBrains Mono', monospace;
-		color: #fff;
-	}
-
-	.separator {
-		color: rgba(255, 255, 255, 0.15);
-	}
-
-	.run-link {
-		color: rgba(255, 255, 255, 0.5);
-		text-decoration: none;
-		font-family: 'JetBrains Mono', monospace;
-	}
-
-	.run-link:hover {
-		color: #fff;
-	}
-
-	.completed-actions {
-		display: flex;
-		gap: 0.75rem;
-		margin-top: 1.25rem;
-	}
-
-	.btn-export {
-		background: #fff;
-		color: #000;
-		border: none;
-		padding: 0.65rem 1.5rem;
-		font-size: 0.75rem;
-		font-weight: 700;
-		font-family: 'Inter', sans-serif;
-		cursor: pointer;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-		transition: all 0.2s;
-	}
-
-	.btn-export:hover {
-		background: rgba(255, 255, 255, 0.85);
-	}
-
-	.btn-again {
-		display: inline-flex;
-		align-items: center;
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		color: rgba(255, 255, 255, 0.6);
-		padding: 0.65rem 1.5rem;
-		font-size: 0.75rem;
-		font-weight: 600;
-		font-family: 'Inter', sans-serif;
-		text-decoration: none;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-		transition: all 0.2s;
-	}
-
-	.btn-again:hover {
-		color: #fff;
-		border-color: rgba(255, 255, 255, 0.4);
-	}
-
-	.error-box {
-		background: rgba(255, 51, 102, 0.1);
-		border: 1px solid rgba(255, 51, 102, 0.2);
-		color: #ff3366;
-		padding: 1rem 1.25rem;
-		font-size: 0.85rem;
-		margin-bottom: 2rem;
-	}
-
-	.live-stats {
-		display: grid;
-		grid-template-columns: repeat(6, 1fr);
-		gap: 1px;
-		background: rgba(255, 255, 255, 0.06);
-		margin-bottom: 3rem;
-	}
-
-	.live-stat {
-		background: #000;
-		padding: 1.25rem 1rem;
-		display: flex;
-		flex-direction: column;
-		gap: 0.2rem;
-	}
-
-	.ls-value {
-		font-size: 1.25rem;
-		font-weight: 700;
-	}
-
-	.ls-label {
-		font-size: 0.6rem;
-		text-transform: uppercase;
-		letter-spacing: 0.12em;
-		color: rgba(255, 255, 255, 0.25);
-		font-weight: 500;
-	}
-
-	.charts {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(min(480px, 100%), 1fr));
-		gap: 1px;
-		background: rgba(255, 255, 255, 0.04);
-	}
-
-	@media (max-width: 768px) {
-		.live-stats {
-			grid-template-columns: repeat(3, 1fr);
-		}
-
-		.ls-value {
-			font-size: 1rem;
-		}
-
-		.live-stat {
-			padding: 1rem 0.75rem;
-		}
-
-		.progress-meta {
-			flex-wrap: wrap;
-			gap: 0.35rem;
-		}
-
-		.charts {
-			grid-template-columns: 1fr;
-		}
-	}
-
-	@media (max-width: 480px) {
-		.live-stats {
-			grid-template-columns: repeat(2, 1fr);
-		}
-
-		.ls-value {
-			font-size: 0.9rem;
-		}
-	}
-</style>

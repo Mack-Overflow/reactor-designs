@@ -88,3 +88,116 @@ export interface IngestResponse {
 	errors: string[];
 	reactors: ReactorDesign[];
 }
+
+// ── Module simulation types ──
+
+export type CoolantType = 'Sodium' | 'Lead' | 'Helium' | 'FLiBe' | 'LightWater';
+export type CycleTypeEnum = 'Rankine' | 'Brayton' | 'SCO2Brayton';
+
+export interface ThermalRequest {
+	thermal_power_mw: number;
+	coolant_type: CoolantType;
+	inlet_temp_c: number;
+	flow_rate_kg_s: number;
+}
+
+export interface CoolantResult {
+	coolant: string;
+	outlet_temp_c: number;
+	delta_t_c: number;
+}
+
+export interface PowerCurvePoint {
+	thermal_power_mw: number;
+	outlet_temp_c: number;
+	delta_t_c: number;
+}
+
+export interface ThermalResponse {
+	outlet_temp_c: number;
+	delta_t_c: number;
+	flow_rate_kg_s: number;
+	coolant_comparison: CoolantResult[];
+	power_curve: PowerCurvePoint[];
+}
+
+export interface PowerRequest {
+	thermal_power_mw: number;
+	outlet_temp_c: number;
+	cycle_type: CycleTypeEnum;
+	rated_electric_power_mw: number;
+}
+
+export interface CycleResult {
+	cycle: string;
+	efficiency: number;
+	electric_power_mw: number;
+	capacity_factor: number;
+}
+
+export interface EfficiencyCurvePoint {
+	outlet_temp_c: number;
+	efficiency: number;
+	carnot: number;
+}
+
+export interface PowerResponse {
+	efficiency: number;
+	electric_power_mw: number;
+	capacity_factor: number;
+	carnot_efficiency: number;
+	cycle_comparison: CycleResult[];
+	efficiency_curve: EfficiencyCurvePoint[];
+}
+
+export interface FuelRequest {
+	initial_heavy_metal_tonnes: number;
+	enrichment_pct: number;
+	target_burnup_gwd_t: number;
+	thermal_power_mw: number;
+	breeding_ratio: number;
+	duration_years: number;
+	time_step_days: number;
+}
+
+export interface FuelStep {
+	time_years: number;
+	burnup_gwd_t: number;
+	fuel_remaining_pct: number;
+	effective_thermal_power_mw: number;
+	fissile_fraction: number;
+	fission_rate_per_s: number;
+}
+
+export interface FuelResponse {
+	steps: FuelStep[];
+	total_steps: number;
+	shutdown_year: number | null;
+	final_burnup_gwd_t: number;
+}
+
+export interface WasteRequest {
+	thermal_power_mw: number;
+	breeding_ratio: number;
+	duration_years: number;
+	time_step_days: number;
+}
+
+export interface IsotopeState {
+	mass_kg: number;
+	activity_bq: number;
+	half_life_years: number;
+}
+
+export interface WasteStep {
+	time_years: number;
+	total_actinides_kg: number;
+	total_fission_products_kg: number;
+	total_activity_bq: number;
+	isotopes: Record<string, IsotopeState>;
+}
+
+export interface WasteResponse {
+	steps: WasteStep[];
+	total_steps: number;
+}

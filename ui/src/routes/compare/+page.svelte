@@ -131,37 +131,36 @@
 	}
 </script>
 
-<h1>Compare Designs</h1>
-<p class="subtitle">Select 2-4 reactor designs to run simulations and compare side by side.</p>
+<h1 class="text-3xl font-extrabold tracking-tight m-0 mb-2 max-lg:text-2xl">Compare Designs</h1>
+<p class="text-white/35 text-[0.95rem] font-light mb-10 max-lg:text-[0.85rem] max-lg:mb-6">Select 2-4 reactor designs to run simulations and compare side by side.</p>
 
 {#if loading}
-	<p class="status">Loading...</p>
+	<p class="text-white/40">Loading...</p>
 {:else}
-	<div class="reactor-grid">
+	<div class="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] grid-divider mb-8 max-lg:grid-cols-1">
 		{#each reactors as r, i}
 			<button
-				class="reactor-card"
-				class:selected={selectedIds.includes(r.id)}
+				class="bg-black border-none p-5 cursor-pointer text-left text-white/50 grid grid-cols-[auto_1fr_auto] gap-4 items-center transition-all duration-200 font-sans relative overflow-hidden hover:bg-white/2 hover:text-white max-lg:p-4 {selectedIds.includes(r.id) ? '!bg-white/4 !text-white' : ''}"
 				onclick={() => toggleReactor(r.id)}
 			>
-				<div class="card-index mono">{String(i + 1).padStart(2, '0')}</div>
-				<div class="card-body">
-					<span class="card-type">{r.design_type}</span>
-					<span class="card-name">{r.name}</span>
+				<div class="font-mono text-[0.7rem] text-white/15">{String(i + 1).padStart(2, '0')}</div>
+				<div class="flex flex-col gap-0.5">
+					<span class="text-[0.6rem] font-bold tracking-wide uppercase opacity-40">{r.design_type}</span>
+					<span class="text-[0.9rem] font-semibold">{r.name}</span>
 					{#if r.vendor}
-						<span class="card-vendor">{r.vendor}</span>
+						<span class="text-xs opacity-40">{r.vendor}</span>
 					{/if}
 				</div>
-				<div class="card-power mono">{r.electric_power_mw ?? '?'} <small>MWe</small></div>
+				<div class="font-mono text-[0.85rem]">{r.electric_power_mw ?? '?'} <small class="text-[0.6rem] opacity-40">MWe</small></div>
 				{#if selectedIds.includes(r.id)}
-					<div class="selected-indicator"></div>
+					<div class="absolute top-0 left-0 w-[3px] h-full bg-white"></div>
 				{/if}
 			</button>
 		{/each}
 	</div>
 
 	{#if selectedIds.length >= 2}
-		<button class="btn-compare" onclick={launchAndCompare} disabled={launching || comparing}>
+		<button class="btn-primary py-3.5 px-10 text-[0.85rem] font-bold tracking-[0.03em] mb-8 max-lg:w-full max-lg:text-center" onclick={launchAndCompare} disabled={launching || comparing}>
 			{#if launching}
 				Running {selectedIds.length} simulations...
 			{:else if comparing}
@@ -171,18 +170,18 @@
 			{/if}
 		</button>
 	{:else}
-		<p class="hint mono">{selectedIds.length}/2 minimum selected</p>
+		<p class="font-mono text-xs text-white/20 mb-8">{selectedIds.length}/2 minimum selected</p>
 	{/if}
 
 	{#if error}
-		<div class="error-box">{error}</div>
+		<div class="error-box mb-8">{error}</div>
 	{/if}
 
 	{#if compareData}
-		<div class="compare-actions">
-			<button class="btn-export" onclick={handleExportComparison}>Export PDF</button>
+		<div class="mb-6">
+			<button class="btn-primary px-6 py-2.5 text-xs font-bold tracking-mid uppercase" onclick={handleExportComparison}>Export PDF</button>
 		</div>
-		<div class="charts">
+		<div class="chart-grid-auto max-lg:grid-cols-1">
 			<TimeSeriesChart labels={timeLabels} datasets={metricDatasets('fuel_burnup_gwd_t')} title="Fuel Burnup" yLabel="GWd/t" />
 			<TimeSeriesChart labels={timeLabels} datasets={metricDatasets('coolant_temp_outlet_c')} title="Outlet Temperature" yLabel="deg C" />
 			<TimeSeriesChart labels={timeLabels} datasets={metricDatasets('electric_power_mw')} title="Electric Power" yLabel="MW" />
@@ -192,206 +191,3 @@
 		</div>
 	{/if}
 {/if}
-
-<style>
-	h1 {
-		font-size: 2rem;
-		font-weight: 800;
-		letter-spacing: -0.03em;
-		margin: 0 0 0.5rem;
-	}
-
-	.subtitle {
-		color: rgba(255, 255, 255, 0.35);
-		font-size: 0.95rem;
-		font-weight: 300;
-		margin: 0 0 2.5rem;
-	}
-
-	.reactor-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-		gap: 1px;
-		background: rgba(255, 255, 255, 0.06);
-		margin-bottom: 2rem;
-	}
-
-	.reactor-card {
-		background: #000;
-		border: none;
-		padding: 1.25rem;
-		cursor: pointer;
-		text-align: left;
-		color: rgba(255, 255, 255, 0.5);
-		display: grid;
-		grid-template-columns: auto 1fr auto;
-		gap: 1rem;
-		align-items: center;
-		transition: all 0.2s;
-		font-family: 'Inter', sans-serif;
-		position: relative;
-		overflow: hidden;
-	}
-
-	.reactor-card:hover {
-		background: rgba(255, 255, 255, 0.02);
-		color: #fff;
-	}
-
-	.reactor-card.selected {
-		background: rgba(255, 255, 255, 0.04);
-		color: #fff;
-	}
-
-	.selected-indicator {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 3px;
-		height: 100%;
-		background: #fff;
-	}
-
-	.card-index {
-		font-size: 0.7rem;
-		color: rgba(255, 255, 255, 0.15);
-	}
-
-	.card-body {
-		display: flex;
-		flex-direction: column;
-		gap: 0.15rem;
-	}
-
-	.card-type {
-		font-size: 0.6rem;
-		font-weight: 700;
-		letter-spacing: 0.15em;
-		text-transform: uppercase;
-		opacity: 0.4;
-	}
-
-	.card-name {
-		font-size: 0.9rem;
-		font-weight: 600;
-	}
-
-	.card-vendor {
-		font-size: 0.75rem;
-		opacity: 0.4;
-	}
-
-	.card-power {
-		font-size: 0.85rem;
-	}
-
-	.card-power small {
-		font-size: 0.6rem;
-		opacity: 0.4;
-	}
-
-	.mono {
-		font-family: 'JetBrains Mono', monospace;
-	}
-
-	.btn-compare {
-		background: #fff;
-		color: #000;
-		border: none;
-		padding: 0.85rem 2.5rem;
-		font-size: 0.85rem;
-		font-weight: 700;
-		font-family: 'Inter', sans-serif;
-		cursor: pointer;
-		letter-spacing: 0.03em;
-		transition: all 0.3s;
-		margin-bottom: 2rem;
-	}
-
-	.btn-compare:hover:not(:disabled) {
-		background: rgba(255, 255, 255, 0.85);
-		transform: translateY(-1px);
-	}
-
-	.btn-compare:disabled {
-		opacity: 0.4;
-		cursor: not-allowed;
-	}
-
-	.hint {
-		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.2);
-		margin-bottom: 2rem;
-	}
-
-	.error-box {
-		background: rgba(255, 51, 102, 0.1);
-		border: 1px solid rgba(255, 51, 102, 0.2);
-		color: #ff3366;
-		padding: 1rem 1.25rem;
-		font-size: 0.85rem;
-		margin-bottom: 2rem;
-	}
-
-	.status {
-		color: rgba(255, 255, 255, 0.4);
-	}
-
-	.compare-actions {
-		margin-bottom: 1.5rem;
-	}
-
-	.btn-export {
-		background: #fff;
-		color: #000;
-		border: none;
-		padding: 0.65rem 1.5rem;
-		font-size: 0.75rem;
-		font-weight: 700;
-		font-family: 'Inter', sans-serif;
-		cursor: pointer;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-		transition: all 0.2s;
-	}
-
-	.btn-export:hover {
-		background: rgba(255, 255, 255, 0.85);
-	}
-
-	.charts {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(min(480px, 100%), 1fr));
-		gap: 1px;
-		background: rgba(255, 255, 255, 0.04);
-	}
-
-	@media (max-width: 768px) {
-		h1 {
-			font-size: 1.5rem;
-		}
-
-		.subtitle {
-			font-size: 0.85rem;
-			margin-bottom: 1.5rem;
-		}
-
-		.reactor-grid {
-			grid-template-columns: 1fr;
-		}
-
-		.reactor-card {
-			grid-template-columns: auto 1fr auto;
-			padding: 1rem;
-		}
-
-		.btn-compare {
-			width: 100%;
-			text-align: center;
-		}
-
-		.charts {
-			grid-template-columns: 1fr;
-		}
-	}
-</style>

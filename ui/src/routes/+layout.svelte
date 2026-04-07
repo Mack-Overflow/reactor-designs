@@ -1,5 +1,7 @@
 <script>
+	import '../app.css';
 	let { children } = $props();
+	let modulesOpen = $state(false);
 </script>
 
 <svelte:head>
@@ -12,162 +14,76 @@
 	/>
 </svelte:head>
 
-<div class="app">
-	<nav>
-		<a href="/" class="logo">
-			<!-- <span class="logo-icon">&#9762;</span> -->
-			<span class="logo-text">REACTOR-WIKI</span>
+<div class="min-h-screen flex flex-col">
+	<nav
+		class="flex items-center justify-between px-12 py-5 border-b border-white/8 backdrop-blur-md sticky top-0 z-100 bg-black/85 max-lg:px-5 max-lg:py-4 max-lg:gap-4"
+	>
+		<a href="/" class="flex items-center gap-2.5 no-underline text-white shrink-0">
+			<span class="text-sm font-extrabold tracking-wider">REACTOR-WIKI</span>
 		</a>
-		<div class="nav-links">
-			<a href="/reactors">Designs</a>
-			<a href="/simulate">Simulate</a>
-			<a href="/compare">Compare</a>
-			<a href="/ingest">Ingest</a>
+		<div
+			class="flex gap-10 max-lg:gap-5 max-lg:overflow-x-auto max-lg:-webkit-overflow-scrolling-touch max-xs:gap-3.5"
+		>
+			<a
+				href="/reactors"
+				class="text-white/45 no-underline text-xs font-medium tracking-nav uppercase transition-colors duration-300 whitespace-nowrap hover:text-white max-lg:text-[0.7rem] max-xs:text-[0.6rem] max-xs:tracking-label"
+				>Designs</a
+			>
+			<a
+				href="/simulate"
+				class="text-white/45 no-underline text-xs font-medium tracking-nav uppercase transition-colors duration-300 whitespace-nowrap hover:text-white max-lg:text-[0.7rem] max-xs:text-[0.6rem] max-xs:tracking-label"
+				>Simulate</a
+			>
+			<div
+				class="relative flex items-center"
+				role="navigation"
+				onmouseenter={() => (modulesOpen = true)}
+				onmouseleave={() => (modulesOpen = false)}
+			>
+				<button
+					type="button"
+					class="text-white/45 bg-transparent border-none cursor-pointer text-xs font-medium tracking-nav uppercase transition-colors duration-300 whitespace-nowrap hover:text-white max-lg:text-[0.7rem] max-xs:text-[0.6rem] max-xs:tracking-label font-sans p-0 leading-none"
+					onclick={() => (modulesOpen = !modulesOpen)}
+				>
+					Modules
+				</button>
+				{#if modulesOpen}
+					<div class="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50">
+						<div class="bg-black/95 border border-white/10 backdrop-blur-md flex flex-col min-w-[180px]">
+							<a href="/modules/fuel" class="px-5 py-3 text-[0.7rem] font-medium tracking-nav uppercase text-white/45 no-underline transition-colors duration-200 hover:text-white hover:bg-white/4" onclick={() => (modulesOpen = false)}>
+								<span class="font-mono text-white/15 mr-2">01</span> Fuel Cycle
+							</a>
+							<a href="/modules/thermal" class="px-5 py-3 text-[0.7rem] font-medium tracking-nav uppercase text-white/45 no-underline transition-colors duration-200 hover:text-white hover:bg-white/4 border-t border-white/4" onclick={() => (modulesOpen = false)}>
+								<span class="font-mono text-white/15 mr-2">02</span> Thermal
+							</a>
+							<a href="/modules/power" class="px-5 py-3 text-[0.7rem] font-medium tracking-nav uppercase text-white/45 no-underline transition-colors duration-200 hover:text-white hover:bg-white/4 border-t border-white/4" onclick={() => (modulesOpen = false)}>
+								<span class="font-mono text-white/15 mr-2">03</span> Power
+							</a>
+							<a href="/modules/waste" class="px-5 py-3 text-[0.7rem] font-medium tracking-nav uppercase text-white/45 no-underline transition-colors duration-200 hover:text-white hover:bg-white/4 border-t border-white/4" onclick={() => (modulesOpen = false)}>
+								<span class="font-mono text-white/15 mr-2">04</span> Waste & Decay
+							</a>
+						</div>
+					</div>
+				{/if}
+			</div>
+			<a
+				href="/compare"
+				class="text-white/45 no-underline text-xs font-medium tracking-nav uppercase transition-colors duration-300 whitespace-nowrap hover:text-white max-lg:text-[0.7rem] max-xs:text-[0.6rem] max-xs:tracking-label"
+				>Compare</a
+			>
+			<a
+				href="/ingest"
+				class="text-white/45 no-underline text-xs font-medium tracking-nav uppercase transition-colors duration-300 whitespace-nowrap hover:text-white max-lg:text-[0.7rem] max-xs:text-[0.6rem] max-xs:tracking-label"
+				>Ingest</a
+			>
 		</div>
 	</nav>
-	<main>
+	<main class="flex-1 max-w-[1400px] w-full mx-auto p-12 max-lg:px-4 max-lg:py-6">
 		{@render children()}
 	</main>
-	<footer>
-		<span>Nuclear Reactor Simulation Platform</span>
+	<footer class="border-t border-white/6 py-8 px-12 text-center max-lg:py-6 max-lg:px-4">
+		<span class="text-[0.7rem] tracking-wide uppercase text-white/20">
+			Nuclear Reactor Simulation Platform
+		</span>
 	</footer>
 </div>
-
-<style>
-	:global(*) {
-		box-sizing: border-box;
-	}
-
-	:global(body) {
-		margin: 0;
-		font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-		background: #000;
-		color: #fff;
-		-webkit-font-smoothing: antialiased;
-	}
-
-	:global(::selection) {
-		background: #fff;
-		color: #000;
-	}
-
-	.app {
-		min-height: 100vh;
-		display: flex;
-		flex-direction: column;
-	}
-
-	nav {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 1.25rem 3rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-		backdrop-filter: blur(12px);
-		position: sticky;
-		top: 0;
-		z-index: 100;
-		background: rgba(0, 0, 0, 0.85);
-	}
-
-	.logo {
-		display: flex;
-		align-items: center;
-		gap: 0.6rem;
-		text-decoration: none;
-		color: #fff;
-		flex-shrink: 0;
-	}
-
-	.logo-icon {
-		font-size: 1.4rem;
-	}
-
-	.logo-text {
-		font-size: 0.85rem;
-		font-weight: 800;
-		letter-spacing: 0.2em;
-	}
-
-	.nav-links {
-		display: flex;
-		gap: 2.5rem;
-	}
-
-	.nav-links a {
-		color: rgba(255, 255, 255, 0.45);
-		text-decoration: none;
-		font-size: 0.8rem;
-		font-weight: 500;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		transition: color 0.3s;
-		white-space: nowrap;
-	}
-
-	.nav-links a:hover {
-		color: #fff;
-	}
-
-	main {
-		flex: 1;
-		max-width: 1400px;
-		width: 100%;
-		margin: 0 auto;
-		padding: 3rem;
-	}
-
-	footer {
-		border-top: 1px solid rgba(255, 255, 255, 0.06);
-		padding: 2rem 3rem;
-		text-align: center;
-	}
-
-	footer span {
-		font-size: 0.7rem;
-		letter-spacing: 0.15em;
-		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.2);
-	}
-
-	@media (max-width: 768px) {
-		nav {
-			padding: 1rem 1.25rem;
-			gap: 1rem;
-		}
-
-		.nav-links {
-			gap: 1.25rem;
-			overflow-x: auto;
-			-webkit-overflow-scrolling: touch;
-		}
-
-		.nav-links a {
-			font-size: 0.7rem;
-		}
-
-		main {
-			padding: 1.5rem 1rem;
-		}
-
-		footer {
-			padding: 1.5rem 1rem;
-		}
-	}
-
-	@media (max-width: 400px) {
-		.logo-text {
-			font-size: 0.7rem;
-			letter-spacing: 0.12em;
-		}
-
-		.nav-links {
-			gap: 0.85rem;
-		}
-
-		.nav-links a {
-			font-size: 0.6rem;
-			letter-spacing: 0.04em;
-		}
-	}
-</style>

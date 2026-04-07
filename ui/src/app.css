@@ -1,0 +1,187 @@
+@import 'tailwindcss' source('../');
+
+/*
+ * Custom theme for Reactor-Wiki
+ * Tailwind v4 CSS-first configuration
+ */
+@theme {
+	/* Breakpoints (mobile-first, matching existing design) */
+	--breakpoint-xs: 400px;
+	--breakpoint-sm: 480px;
+	--breakpoint-md: 600px;
+	--breakpoint-lg: 768px;
+	--breakpoint-xl: 900px;
+	--breakpoint-2xl: 1400px;
+
+	/* Fonts */
+	--font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	--font-mono: 'JetBrains Mono', monospace;
+
+	/* Letter spacing */
+	--tracking-tight: -0.03em;
+	--tracking-snug: -0.02em;
+	--tracking-slight: -0.01em;
+	--tracking-normal: 0;
+	--tracking-label: 0.02em;
+	--tracking-mid: 0.06em;
+	--tracking-nav: 0.08em;
+	--tracking-caps: 0.12em;
+	--tracking-wide: 0.15em;
+	--tracking-wider: 0.2em;
+}
+
+/* Global resets (migrated from +layout.svelte :global()) */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	font-family: var(--font-sans);
+	background: #000;
+	color: #fff;
+	-webkit-font-smoothing: antialiased;
+}
+
+::selection {
+	background: #fff;
+	color: #000;
+}
+
+/*
+ * Reusable component classes
+ * These patterns repeat across many pages and are too complex for inline utilities.
+ */
+
+/* 1px-gap grid divider pattern: parent gets this, children get bg-black */
+.grid-divider {
+	gap: 1px;
+	background: rgba(255, 255, 255, 0.06);
+}
+
+/* Gradient text highlight (home hero) */
+.text-gradient {
+	background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.5) 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+/* Primary button (white bg, black text) */
+.btn-primary {
+	display: inline-block;
+	background: #fff;
+	color: #000;
+	padding: 0.75rem 2rem;
+	font-size: 0.85rem;
+	font-weight: 600;
+	text-decoration: none;
+	transition: all 0.3s;
+	letter-spacing: 0.02em;
+	border: none;
+	cursor: pointer;
+	font-family: var(--font-sans);
+}
+.btn-primary:hover:not(:disabled) {
+	background: rgba(255, 255, 255, 0.85);
+	transform: translateY(-1px);
+}
+.btn-primary:disabled {
+	opacity: 0.3;
+	cursor: not-allowed;
+}
+
+/* Outline / ghost button */
+.btn-outline {
+	display: inline-block;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	color: #fff;
+	padding: 0.75rem 2rem;
+	font-size: 0.85rem;
+	font-weight: 500;
+	text-decoration: none;
+	transition: all 0.3s;
+	letter-spacing: 0.02em;
+	background: transparent;
+	cursor: pointer;
+	font-family: var(--font-sans);
+}
+.btn-outline:hover:not(:disabled) {
+	border-color: rgba(255, 255, 255, 0.5);
+	background: rgba(255, 255, 255, 0.05);
+}
+
+/* Section heading (small uppercase label) */
+.section-heading {
+	font-size: 0.7rem;
+	font-weight: 600;
+	letter-spacing: 0.15em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.3);
+	margin: 0;
+}
+
+/* Error text */
+.text-error {
+	color: #ff3366;
+}
+
+/* Error box */
+.error-box {
+	background: rgba(255, 51, 102, 0.1);
+	border: 1px solid rgba(255, 51, 102, 0.2);
+	color: #ff3366;
+	padding: 1rem 1.25rem;
+	font-size: 0.85rem;
+}
+
+/* Type badge */
+.type-badge {
+	display: inline-block;
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	padding: 0.15rem 0.45rem;
+	font-size: 0.65rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+/* Table grid (reactors / ingest) */
+.table-header {
+	display: grid;
+	grid-template-columns: 80px 1.5fr 1fr 0.8fr 0.8fr 1fr 1fr;
+	padding: 0.75rem 1.25rem;
+	font-size: 0.65rem;
+	font-weight: 600;
+	letter-spacing: 0.15em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.25);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.table-row {
+	display: grid;
+	grid-template-columns: 80px 1.5fr 1fr 0.8fr 0.8fr 1fr 1fr;
+	padding: 1rem 1.25rem;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+	text-decoration: none;
+	color: #fff;
+	font-size: 0.85rem;
+	transition: background 0.2s;
+	align-items: center;
+}
+.table-row:hover {
+	background: rgba(255, 255, 255, 0.03);
+}
+.table-row:last-child {
+	border-bottom: none;
+}
+
+/* Chart grid with 1px divider */
+.chart-grid-auto {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(480px, 100%), 1fr));
+	gap: 1px;
+	background: rgba(255, 255, 255, 0.04);
+}

@@ -144,17 +144,6 @@
 	});
 </script>
 
-<div class="chart-container">
+<div class="relative h-[320px] bg-white/2 border border-white/6 rounded-sm p-5">
 	<canvas bind:this={canvas}></canvas>
 </div>
-
-<style>
-	.chart-container {
-		position: relative;
-		height: 320px;
-		background: rgba(255, 255, 255, 0.02);
-		border: 1px solid rgba(255, 255, 255, 0.06);
-		border-radius: 2px;
-		padding: 1.25rem;
-	}
-</style>

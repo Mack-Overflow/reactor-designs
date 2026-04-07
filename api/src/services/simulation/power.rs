@@ -156,7 +156,6 @@ mod tests {
     use super::*;
 
     // ── Efficiency curve tests ──
-
     #[test]
     fn rankine_below_range() {
         let eff = thermal_efficiency(CycleType::Rankine, 200.0);

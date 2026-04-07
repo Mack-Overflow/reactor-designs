@@ -19,6 +19,13 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
                 .route("/{id}/results", web::get().to(handlers::simulations::get_simulation_results))
                 .route("/{id}/waste", web::get().to(handlers::simulations::get_simulation_waste)),
         )
+        .service(
+            web::scope("/api/modules")
+                .route("/thermal", web::post().to(handlers::modules::run_thermal))
+                .route("/power", web::post().to(handlers::modules::run_power))
+                .route("/fuel", web::post().to(handlers::modules::run_fuel))
+                .route("/waste", web::post().to(handlers::modules::run_waste)),
+        )
         .route("/api/compare", web::post().to(handlers::compare::compare_runs))
         .route("/api/ingest", web::post().to(handlers::ingest::ingest_file));
 }

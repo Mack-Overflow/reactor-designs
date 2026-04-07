@@ -69,87 +69,54 @@
 </script>
 
 {#if loading}
-	<p class="status">Loading simulation results...</p>
+	<p class="text-[#94a3b8]">Loading simulation results...</p>
 {:else if error}
-	<p class="status error">{error}</p>
+	<p class="text-[#f87171]">{error}</p>
 {:else if run}
-	<div class="header">
-		<a href="/simulate" class="back">&larr; New Simulation</a>
-		<h1>Simulation Results</h1>
-		<div class="meta">
-			<span class="badge {run.status}">{run.status}</span>
-			<span class="meta-item">Run ID: {run.id.slice(0, 8)}...</span>
+	<div>
+		<a href="/simulate" class="text-[#38bdf8] no-underline text-[0.85rem] hover:underline">&larr; New Simulation</a>
+		<h1 class="text-[1.75rem] mt-2 mb-2">Simulation Results</h1>
+		<div class="flex gap-4 items-center mb-6">
+			<span class="text-[0.7rem] font-bold px-2 py-0.5 rounded uppercase
+				{run.status === 'completed' ? 'bg-[#34d399] text-[#0f172a]' : ''}
+				{run.status === 'failed' ? 'bg-[#f87171] text-[#0f172a]' : ''}
+				{run.status === 'running' ? 'bg-[#facc15] text-[#0f172a]' : ''}">{run.status}</span>
+			<span class="text-[0.8rem] text-[#64748b]">Run ID: {run.id.slice(0, 8)}...</span>
 			{#if run.completed_at}
-				<span class="meta-item">Completed: {new Date(run.completed_at).toLocaleString()}</span>
+				<span class="text-[0.8rem] text-[#64748b]">Completed: {new Date(run.completed_at).toLocaleString()}</span>
 			{/if}
 		</div>
 	</div>
 
 	{#if results.length > 0}
-		<div class="charts">
-			<TimeSeriesChart
-				labels={timeLabels}
-				datasets={burnupData}
-				title="Fuel Burnup"
-				yLabel="GWd/t"
-			/>
-
-			<TimeSeriesChart
-				labels={timeLabels}
-				datasets={tempData}
-				title="Coolant Temperature"
-				yLabel="Temperature (C)"
-			/>
-
-			<TimeSeriesChart
-				labels={timeLabels}
-				datasets={powerData}
-				title="Power Output"
-				yLabel="MW"
-			/>
-
-			<TimeSeriesChart
-				labels={timeLabels}
-				datasets={capacityData}
-				title="Capacity Factor"
-				yLabel="Factor (0-1)"
-			/>
-
-			<TimeSeriesChart
-				labels={timeLabels}
-				datasets={wasteData}
-				title="Waste Inventory"
-				yLabel="Mass (kg)"
-			/>
-
-			<TimeSeriesChart
-				labels={timeLabels}
-				datasets={activityData}
-				title="Total Radioactivity"
-				yLabel="Activity (Bq)"
-				logScale={true}
-			/>
+		<div class="grid grid-cols-[repeat(auto-fit,minmax(480px,1fr))] gap-4">
+			<TimeSeriesChart labels={timeLabels} datasets={burnupData} title="Fuel Burnup" yLabel="GWd/t" />
+			<TimeSeriesChart labels={timeLabels} datasets={tempData} title="Coolant Temperature" yLabel="Temperature (C)" />
+			<TimeSeriesChart labels={timeLabels} datasets={powerData} title="Power Output" yLabel="MW" />
+			<TimeSeriesChart labels={timeLabels} datasets={capacityData} title="Capacity Factor" yLabel="Factor (0-1)" />
+			<TimeSeriesChart labels={timeLabels} datasets={wasteData} title="Waste Inventory" yLabel="Mass (kg)" />
+			<TimeSeriesChart labels={timeLabels} datasets={activityData} title="Total Radioactivity" yLabel="Activity (Bq)" logScale={true} />
 		</div>
 
 		{#if waste.length > 0}
-			<section class="waste-section">
-				<h2>Final Isotope Inventory</h2>
-				<table>
+			<section class="mt-8">
+				<h2 class="text-base text-[#38bdf8] uppercase tracking-[0.05em] mb-3">Final Isotope Inventory</h2>
+				<table class="w-full border-collapse bg-[#1e293b] border border-[#334155] rounded-lg overflow-hidden">
 					<thead>
 						<tr>
-							<th>Isotope</th>
-							<th>Mass (kg)</th>
-							<th>Activity (Bq)</th>
-							<th>Half-life (yr)</th>
+							<th class="text-left px-4 py-2.5 text-xs uppercase text-[#94a3b8] border-b border-[#334155]">Isotope</th>
+							<th class="text-left px-4 py-2.5 text-xs uppercase text-[#94a3b8] border-b border-[#334155]">Mass (kg)</th>
+							<th class="text-left px-4 py-2.5 text-xs uppercase text-[#94a3b8] border-b border-[#334155]">Activity (Bq)</th>
+							<th class="text-left px-4 py-2.5 text-xs uppercase text-[#94a3b8] border-b border-[#334155]">Half-life (yr)</th>
 						</tr>
 					</thead>
 					<tbody>
 						{#each waste as iso}
-							<tr>
-								<td>{iso.isotope}</td>
-								<td>{Number(iso.mass_kg ?? 0).toExponential(3)}</td>
-								<td>{Number(iso.activity_bq ?? 0).toExponential(3)}</td>
-								<td>{Number(iso.half_life_years ?? 0).toExponential(3)}</td>
+							<tr class="hover:*:bg-[#334155]">
+								<td class="px-4 py-2 text-[0.85rem] border-b border-[#1e293b] font-mono">{iso.isotope}</td>
+								<td class="px-4 py-2 text-[0.85rem] border-b border-[#1e293b] font-mono">{Number(iso.mass_kg ?? 0).toExponential(3)}</td>
+								<td class="px-4 py-2 text-[0.85rem] border-b border-[#1e293b] font-mono">{Number(iso.activity_bq ?? 0).toExponential(3)}</td>
+								<td class="px-4 py-2 text-[0.85rem] border-b border-[#1e293b] font-mono">{Number(iso.half_life_years ?? 0).toExponential(3)}</td>
 							</tr>
 						{/each}
 					</tbody>
@@ -157,113 +124,6 @@
 			</section>
 		{/if}
 	{:else}
-		<p class="status">No results available for this simulation.</p>
+		<p class="text-[#94a3b8]">No results available for this simulation.</p>
 	{/if}
 {/if}
-
-<style>
-	.status {
-		color: #94a3b8;
-	}
-
-	.error {
-		color: #f87171;
-	}
-
-	.back {
-		color: #38bdf8;
-		text-decoration: none;
-		font-size: 0.85rem;
-	}
-
-	.back:hover {
-		text-decoration: underline;
-	}
-
-	h1 {
-		font-size: 1.75rem;
-		margin: 0.5rem 0;
-	}
-
-	.meta {
-		display: flex;
-		gap: 1rem;
-		align-items: center;
-		margin-bottom: 1.5rem;
-	}
-
-	.badge {
-		font-size: 0.7rem;
-		font-weight: 700;
-		padding: 0.15rem 0.5rem;
-		border-radius: 4px;
-		text-transform: uppercase;
-	}
-
-	.badge.completed {
-		background: #34d399;
-		color: #0f172a;
-	}
-
-	.badge.failed {
-		background: #f87171;
-		color: #0f172a;
-	}
-
-	.badge.running {
-		background: #facc15;
-		color: #0f172a;
-	}
-
-	.meta-item {
-		font-size: 0.8rem;
-		color: #64748b;
-	}
-
-	.charts {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
-		gap: 1rem;
-	}
-
-	.waste-section {
-		margin-top: 2rem;
-	}
-
-	h2 {
-		font-size: 1rem;
-		color: #38bdf8;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		margin-bottom: 0.75rem;
-	}
-
-	table {
-		width: 100%;
-		border-collapse: collapse;
-		background: #1e293b;
-		border: 1px solid #334155;
-		border-radius: 8px;
-		overflow: hidden;
-	}
-
-	th {
-		text-align: left;
-		padding: 0.6rem 1rem;
-		font-size: 0.75rem;
-		text-transform: uppercase;
-		color: #94a3b8;
-		border-bottom: 1px solid #334155;
-	}
-
-	td {
-		padding: 0.5rem 1rem;
-		font-size: 0.85rem;
-		border-bottom: 1px solid #1e293b;
-		font-family: monospace;
-	}
-
-	tr:hover td {
-		background: #334155;
-	}
-</style>

@@ -20,7 +20,7 @@
 	let coolantFlowRateKgS = $state(4400);
 	let ratedElectricPowerMw = $state(345);
 
-	// ── Tooltip state ──────────────────────────────────────
+	// ── Tooltip state ──────────────────────────────────
 	let activeTooltip = $state<string | null>(null);
 
 	function toggleTip(id: string) {
@@ -95,7 +95,7 @@
 		}
 	};
 
-	// ── Derived warnings for current values ────────────────
+	// ── Derived warnings for current values ────────────
 	let warnings = $derived.by(() => {
 		const w: Record<string, string | null> = {};
 		for (const [key, meta] of Object.entries(PARAM_META)) {
@@ -216,30 +216,29 @@
 	}
 </script>
 
-<h1>Configure Simulation</h1>
-<p class="subtitle">Select a reactor and configure physics parameters for the simulation run.</p>
+<h1 class="text-3xl font-extrabold tracking-tight m-0 mb-2 max-lg:text-2xl">Configure Simulation</h1>
+<p class="text-white/35 text-[0.95rem] font-light mb-12 max-lg:text-[0.85rem] max-lg:mb-8">Select a reactor and configure physics parameters for the simulation run.</p>
 
 {#if loading}
-	<p class="status">Loading reactors…</p>
+	<p class="text-white/40">Loading reactors...</p>
 {:else}
 	<form onsubmit={(e) => { e.preventDefault(); launch(); }}>
-		<div class="phase" class:mobile-hidden={mobilePhase !== 1}>
-			<section class="section">
-				<h2>01 &mdash; Select Reactor</h2>
-				<div class="reactor-selector">
+		<div class:max-lg:hidden={mobilePhase !== 1}>
+			<section class="mb-10 max-lg:mb-8">
+				<h2 class="section-heading mb-2">01 &mdash; Select Reactor</h2>
+				<div class="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] grid-divider bg-white/8">
 					{#each reactors as r}
 						<button
 							type="button"
-							class="reactor-option"
-							class:selected={selectedReactorId === r.id}
+							class="bg-black border-none p-5 text-left text-white/50 cursor-pointer flex flex-col gap-1 transition-all duration-200 font-sans hover:bg-white/3 hover:text-white max-lg:p-4 {selectedReactorId === r.id ? '!bg-white !text-black' : ''}"
 							onclick={() => { selectedReactorId = r.id; mobilePhase = 2; }}
 						>
-							<span class="ro-type">{r.design_type}</span>
-							<span class="ro-name">{r.name}</span>
-							<span class="ro-detail">
+							<span class="text-[0.6rem] font-bold tracking-wide uppercase opacity-40 {selectedReactorId === r.id ? '!opacity-50' : ''}">{r.design_type}</span>
+							<span class="text-[0.9rem] font-semibold">{r.name}</span>
+							<span class="text-[0.7rem] opacity-45 leading-snug">
 								{r.coolant_type ?? '—'} &middot; {r.fuel_type ?? '—'} &middot; {r.enrichment_pct ?? '?'}% enriched
 							</span>
-							<span class="ro-power mono">{r.thermal_power_mw ?? '?'} MWth &rarr; {r.electric_power_mw ?? '?'} MWe</span>
+							<span class="text-[0.8rem] opacity-60 mt-0.5 font-mono">{r.thermal_power_mw ?? '?'} MWth &rarr; {r.electric_power_mw ?? '?'} MWe</span>
 						</button>
 					{/each}
 				</div>
@@ -247,15 +246,15 @@
 		</div>
 
 		{#if selectedReactor}
-		<div class="phase" class:mobile-hidden={mobilePhase !== 2}>
-			<button type="button" class="mobile-back" onclick={() => (mobilePhase = 1)}>
+		<div class:max-lg:hidden={mobilePhase !== 2}>
+			<button type="button" class="hidden max-lg:inline-flex max-lg:items-center max-lg:gap-1 bg-none border-none text-white/40 text-[0.8rem] font-sans cursor-pointer p-0 mb-6 transition-colors duration-200 hover:text-white" onclick={() => (mobilePhase = 1)}>
 				&larr; Change Reactor
 			</button>
 			<!-- Reactor context banner -->
-			<div class="reactor-context">
-				<span class="rc-label">Modeling</span>
-				<span class="rc-name">{selectedReactor.name}</span>
-				<span class="rc-specs">
+			<div class="flex flex-wrap items-baseline gap-y-2 gap-x-4 px-5 py-4 mb-10 border-l-2 border-white/15 bg-white/2">
+				<span class="text-[0.6rem] font-semibold tracking-caps uppercase text-white/30">Modeling</span>
+				<span class="text-base font-bold text-white">{selectedReactor.name}</span>
+				<span class="text-xs text-white/35 w-full">
 					{selectedReactor.coolant_type} cooled &middot;
 					{selectedReactor.fuel_type} fuel &middot;
 					{selectedReactor.enrichment_pct}% enrichment &middot;
@@ -263,557 +262,96 @@
 				</span>
 			</div>
 
-			<section class="section">
-				<h2>02 &mdash; Simulation Parameters</h2>
-				<div class="param-grid">
-					<label>
-						<div class="param-header">
-							<span class="param-label">Duration</span>
-							<button type="button" class="tip-btn" onclick={() => toggleTip('durationYears')} aria-label="More info">?</button>
-						</div>
-						<span class="param-hint">{PARAM_META.durationYears.short}</span>
-						{#if activeTooltip === 'durationYears'}
-							<div class="tip-expanded">{PARAM_META.durationYears.detail}<span class="tip-range">Typical: {PARAM_META.durationYears.typicalRange}</span></div>
-						{/if}
-						<div class="input-wrap">
-							<input type="number" bind:value={durationYears} min="0.1" step="any" required />
-							<span class="input-unit">years</span>
-						</div>
-						<span class="param-range">Typical: {PARAM_META.durationYears.typicalRange}</span>
-						{#if warnings.durationYears}
-							<span class="param-warn">{warnings.durationYears}</span>
-						{/if}
-					</label>
-					<label>
-						<div class="param-header">
-							<span class="param-label">Time Step</span>
-							<button type="button" class="tip-btn" onclick={() => toggleTip('timeStepDays')} aria-label="More info">?</button>
-						</div>
-						<span class="param-hint">{PARAM_META.timeStepDays.short}</span>
-						{#if activeTooltip === 'timeStepDays'}
-							<div class="tip-expanded">{PARAM_META.timeStepDays.detail}<span class="tip-range">Typical: {PARAM_META.timeStepDays.typicalRange}</span></div>
-						{/if}
-						<div class="input-wrap">
-							<input type="number" bind:value={timeStepDays} min="1" step="1" required />
-							<span class="input-unit">days</span>
-						</div>
-						<span class="param-range">Typical: {PARAM_META.timeStepDays.typicalRange}</span>
-						{#if warnings.timeStepDays}
-							<span class="param-warn">{warnings.timeStepDays}</span>
-						{/if}
-					</label>
+			<section class="mb-10 max-lg:mb-8">
+				<h2 class="section-heading mb-2">02 &mdash; Simulation Parameters</h2>
+				<div class="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-5 max-lg:grid-cols-1 max-lg:gap-4">
+					{@render paramField('durationYears', 'Duration', durationYears, (v) => durationYears = v, 0.1, undefined, 'years')}
+					{@render paramField('timeStepDays', 'Time Step', timeStepDays, (v) => timeStepDays = v, 1, undefined, 'days')}
 				</div>
 			</section>
 
-			<section class="section">
-				<h2>03 &mdash; Fuel Configuration</h2>
-				<p class="section-desc">
+			<section class="mb-10 max-lg:mb-8">
+				<h2 class="section-heading mb-2">03 &mdash; Fuel Configuration</h2>
+				<p class="text-white/40 text-[0.8rem] leading-relaxed mb-5 max-w-[60ch]">
 					Controls how fuel is consumed over the reactor's operating life. Burnup and breeding ratio
 					are the primary differentiators between once-through and closed fuel cycles.
 				</p>
-				<div class="param-grid">
-					<label>
-						<div class="param-header">
-							<span class="param-label">Heavy Metal Loading</span>
-							<button type="button" class="tip-btn" onclick={() => toggleTip('initialHeavyMetalTonnes')} aria-label="More info">?</button>
-						</div>
-						<span class="param-hint">{PARAM_META.initialHeavyMetalTonnes.short}</span>
-						{#if activeTooltip === 'initialHeavyMetalTonnes'}
-							<div class="tip-expanded">{PARAM_META.initialHeavyMetalTonnes.detail}<span class="tip-range">Typical: {PARAM_META.initialHeavyMetalTonnes.typicalRange}</span></div>
-						{/if}
-						<div class="input-wrap">
-							<input type="number" bind:value={initialHeavyMetalTonnes} min="0.1" step="0.1" required />
-							<span class="input-unit">tonnes</span>
-						</div>
-						<span class="param-range">Typical: {PARAM_META.initialHeavyMetalTonnes.typicalRange}</span>
-					</label>
-					<label>
-						<div class="param-header">
-							<span class="param-label">Target Burnup</span>
-							<button type="button" class="tip-btn" onclick={() => toggleTip('targetBurnupGwdT')} aria-label="More info">?</button>
-						</div>
-						<span class="param-hint">{PARAM_META.targetBurnupGwdT.short}</span>
-						{#if activeTooltip === 'targetBurnupGwdT'}
-							<div class="tip-expanded">{PARAM_META.targetBurnupGwdT.detail}<span class="tip-range">Typical: {PARAM_META.targetBurnupGwdT.typicalRange}</span></div>
-						{/if}
-						<div class="input-wrap">
-							<input type="number" bind:value={targetBurnupGwdT} min="1" step="1" required />
-							<span class="input-unit">GWd/t</span>
-						</div>
-						<span class="param-range">Typical: {PARAM_META.targetBurnupGwdT.typicalRange}</span>
-						{#if warnings.targetBurnupGwdT}
-							<span class="param-warn">{warnings.targetBurnupGwdT}</span>
-						{/if}
-					</label>
-					<label>
-						<div class="param-header">
-							<span class="param-label">Breeding Ratio</span>
-							<button type="button" class="tip-btn" onclick={() => toggleTip('breedingRatio')} aria-label="More info">?</button>
-						</div>
-						<span class="param-hint">{PARAM_META.breedingRatio.short}</span>
-						{#if activeTooltip === 'breedingRatio'}
-							<div class="tip-expanded">{PARAM_META.breedingRatio.detail}<span class="tip-range">Typical: {PARAM_META.breedingRatio.typicalRange}</span></div>
-						{/if}
-						<div class="input-wrap">
-							<input type="number" bind:value={breedingRatio} min="0" max="2" step="0.1" required />
-						</div>
-						<span class="param-range">Typical: {PARAM_META.breedingRatio.typicalRange}</span>
-						{#if warnings.breedingRatio}
-							<span class="param-warn">{warnings.breedingRatio}</span>
-						{/if}
-					</label>
+				<div class="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-5 max-lg:grid-cols-1 max-lg:gap-4">
+					{@render paramField('initialHeavyMetalTonnes', 'Heavy Metal Loading', initialHeavyMetalTonnes, (v) => initialHeavyMetalTonnes = v, 0.1, undefined, 'tonnes')}
+					{@render paramField('targetBurnupGwdT', 'Target Burnup', targetBurnupGwdT, (v) => targetBurnupGwdT = v, 1, undefined, 'GWd/t')}
+					{@render paramField('breedingRatio', 'Breeding Ratio', breedingRatio, (v) => breedingRatio = v, 0, 2)}
 				</div>
 			</section>
 
-			<section class="section">
-				<h2>04 &mdash; Coolant & Power Cycle</h2>
-				<p class="section-desc">
+			<section class="mb-10 max-lg:mb-8">
+				<h2 class="section-heading mb-2">04 &mdash; Coolant & Power Cycle</h2>
+				<p class="text-white/40 text-[0.8rem] leading-relaxed mb-5 max-w-[60ch]">
 					Coolant properties determine heat removal from the core. The temperature difference
 					between inlet and outlet directly sets thermodynamic cycle efficiency.
 				</p>
-				<div class="param-grid">
-					<label>
-						<div class="param-header">
-							<span class="param-label">Inlet Temperature</span>
-							<button type="button" class="tip-btn" onclick={() => toggleTip('coolantInletTempC')} aria-label="More info">?</button>
-						</div>
-						<span class="param-hint">{PARAM_META.coolantInletTempC.short}</span>
-						{#if activeTooltip === 'coolantInletTempC'}
-							<div class="tip-expanded">{PARAM_META.coolantInletTempC.detail}<span class="tip-range">Typical: {PARAM_META.coolantInletTempC.typicalRange}</span></div>
-						{/if}
-						<div class="input-wrap">
-							<input type="number" bind:value={coolantInletTempC} step="1" required />
-							<span class="input-unit">&deg;C</span>
-						</div>
-						<span class="param-range">Typical: {PARAM_META.coolantInletTempC.typicalRange}</span>
-					</label>
-					<label>
-						<div class="param-header">
-							<span class="param-label">Flow Rate</span>
-							<button type="button" class="tip-btn" onclick={() => toggleTip('coolantFlowRateKgS')} aria-label="More info">?</button>
-						</div>
-						<span class="param-hint">{PARAM_META.coolantFlowRateKgS.short}</span>
-						{#if activeTooltip === 'coolantFlowRateKgS'}
-							<div class="tip-expanded">{PARAM_META.coolantFlowRateKgS.detail}<span class="tip-range">Typical: {PARAM_META.coolantFlowRateKgS.typicalRange}</span></div>
-						{/if}
-						<div class="input-wrap">
-							<input type="number" bind:value={coolantFlowRateKgS} min="1" step="1" required />
-							<span class="input-unit">kg/s</span>
-						</div>
-						<span class="param-range">Typical: {PARAM_META.coolantFlowRateKgS.typicalRange}</span>
-					</label>
-					<label>
-						<div class="param-header">
-							<span class="param-label">Rated Electric Power</span>
-							<button type="button" class="tip-btn" onclick={() => toggleTip('ratedElectricPowerMw')} aria-label="More info">?</button>
-						</div>
-						<span class="param-hint">{PARAM_META.ratedElectricPowerMw.short}</span>
-						{#if activeTooltip === 'ratedElectricPowerMw'}
-							<div class="tip-expanded">{PARAM_META.ratedElectricPowerMw.detail}<span class="tip-range">Typical: {PARAM_META.ratedElectricPowerMw.typicalRange}</span></div>
-						{/if}
-						<div class="input-wrap">
-							<input type="number" bind:value={ratedElectricPowerMw} min="0" step="1" required />
-							<span class="input-unit">MWe</span>
-						</div>
-						<span class="param-range">Typical: {PARAM_META.ratedElectricPowerMw.typicalRange}</span>
-					</label>
+				<div class="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-5 max-lg:grid-cols-1 max-lg:gap-4">
+					{@render paramField('coolantInletTempC', 'Inlet Temperature', coolantInletTempC, (v) => coolantInletTempC = v, undefined, undefined, '°C')}
+					{@render paramField('coolantFlowRateKgS', 'Flow Rate', coolantFlowRateKgS, (v) => coolantFlowRateKgS = v, 1, undefined, 'kg/s')}
+					{@render paramField('ratedElectricPowerMw', 'Rated Electric Power', ratedElectricPowerMw, (v) => ratedElectricPowerMw = v, 0, undefined, 'MWe')}
 				</div>
 			</section>
 
 			<!-- Live efficiency estimate -->
 			{#if efficiencyPreview}
-				<div class="efficiency-preview">
-					<h2>05 &mdash; Estimated Output</h2>
-					<p class="section-desc">Derived from your current parameter selections. These are starting estimates. Actual values evolve over the simulation as fuel depletes and temperatures shift.</p>
-					<div class="ep-grid">
-						<div class="ep-item">
-							<span class="ep-value mono">{efficiencyPreview.estOutletC}°C</span>
-							<span class="ep-label">Est. outlet temp</span>
+				<div class="mb-10 p-5 border border-white/6 bg-white/2">
+					<h2 class="section-heading mb-2">05 &mdash; Estimated Output</h2>
+					<p class="text-white/40 text-[0.8rem] leading-relaxed mb-5 max-w-[60ch]">Derived from your current parameter selections. These are starting estimates. Actual values evolve over the simulation as fuel depletes and temperatures shift.</p>
+					<div class="flex gap-8 flex-wrap max-lg:gap-5">
+						<div class="flex flex-col gap-1">
+							<span class="text-[1.4rem] font-bold text-white font-mono">{efficiencyPreview.estOutletC}°C</span>
+							<span class="text-[0.65rem] font-medium uppercase tracking-[0.1em] text-white/25">Est. outlet temp</span>
 						</div>
-						<div class="ep-item">
-							<span class="ep-value mono">{efficiencyPreview.carnotPct}%</span>
-							<span class="ep-label">Carnot limit</span>
+						<div class="flex flex-col gap-1">
+							<span class="text-[1.4rem] font-bold text-white font-mono">{efficiencyPreview.carnotPct}%</span>
+							<span class="text-[0.65rem] font-medium uppercase tracking-[0.1em] text-white/25">Carnot limit</span>
 						</div>
-						<div class="ep-item">
-							<span class="ep-value mono">{efficiencyPreview.practicalPct}%</span>
-							<span class="ep-label">Est. cycle efficiency</span>
+						<div class="flex flex-col gap-1">
+							<span class="text-[1.4rem] font-bold text-white font-mono">{efficiencyPreview.practicalPct}%</span>
+							<span class="text-[0.65rem] font-medium uppercase tracking-[0.1em] text-white/25">Est. cycle efficiency</span>
 						</div>
 					</div>
 				</div>
 			{/if}
 
 			{#if error}
-				<p class="error">{error}</p>
+				<p class="text-error mb-4">{error}</p>
 			{/if}
 
-			<button type="submit" class="btn-launch" disabled={submitting}>
-				{submitting ? 'Launching…' : 'Launch Simulation'}
+			<button type="submit" class="btn-primary py-3.5 px-10 text-[0.85rem] font-bold tracking-[0.03em] max-lg:w-full max-lg:text-center" disabled={submitting}>
+				{submitting ? 'Launching...' : 'Launch Simulation'}
 			</button>
 		</div>
 		{/if}
 	</form>
 {/if}
 
-<style>
-	h1 {
-		font-size: 2rem;
-		font-weight: 800;
-		letter-spacing: -0.03em;
-		margin: 0 0 0.5rem;
-	}
-
-	.subtitle {
-		color: rgba(255, 255, 255, 0.35);
-		font-size: 0.95rem;
-		font-weight: 300;
-		margin: 0 0 3rem;
-	}
-
-	.section {
-		margin-bottom: 2.5rem;
-	}
-
-	h2 {
-		font-size: 0.7rem;
-		font-weight: 600;
-		letter-spacing: 0.15em;
-		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.3);
-		margin: 0 0 0.5rem;
-	}
-
-	.section-desc {
-		color: rgba(255, 255, 255, 0.25);
-		font-size: 0.8rem;
-		line-height: 1.5;
-		margin: 0 0 1.25rem;
-		max-width: 60ch;
-	}
-
-	/* ── Reactor selector ────────────────────────────── */
-
-	.reactor-selector {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-		gap: 1px;
-		background: rgba(255, 255, 255, 0.08);
-	}
-
-	.reactor-option {
-		background: #000;
-		border: none;
-		padding: 1.25rem;
-		text-align: left;
-		color: rgba(255, 255, 255, 0.5);
-		cursor: pointer;
-		display: flex;
-		flex-direction: column;
-		gap: 0.3rem;
-		transition: all 0.2s;
-		font-family: 'Inter', sans-serif;
-	}
-
-	.reactor-option:hover {
-		background: rgba(255, 255, 255, 0.03);
-		color: #fff;
-	}
-
-	.reactor-option.selected {
-		background: #fff;
-		color: #000;
-	}
-
-	.ro-type {
-		font-size: 0.6rem;
-		font-weight: 700;
-		letter-spacing: 0.15em;
-		text-transform: uppercase;
-		opacity: 0.4;
-	}
-
-	.reactor-option.selected .ro-type { opacity: 0.5; }
-
-	.ro-name {
-		font-size: 0.9rem;
-		font-weight: 600;
-	}
-
-	.ro-detail {
-		font-size: 0.7rem;
-		opacity: 0.45;
-		line-height: 1.4;
-	}
-
-	.ro-power {
-		font-size: 0.8rem;
-		opacity: 0.6;
-		margin-top: 0.15rem;
-	}
-
-	.mono { font-family: 'JetBrains Mono', monospace; }
-
-	/* ── Reactor context banner ──────────────────────── */
-
-	.reactor-context {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
-		gap: 0.5rem 1rem;
-		padding: 1rem 1.25rem;
-		margin-bottom: 2.5rem;
-		border-left: 2px solid rgba(255, 255, 255, 0.15);
-		background: rgba(255, 255, 255, 0.02);
-	}
-
-	.rc-label {
-		font-size: 0.6rem;
-		font-weight: 600;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.3);
-	}
-
-	.rc-name {
-		font-size: 1rem;
-		font-weight: 700;
-		color: #fff;
-	}
-
-	.rc-specs {
-		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.35);
-		width: 100%;
-	}
-
-	/* ── Parameter inputs ────────────────────────────── */
-
-	.param-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-		gap: 1.25rem;
-	}
-
-	label {
-		display: flex;
-		flex-direction: column;
-		gap: 0.3rem;
-	}
-
-	.param-header {
-		display: flex;
-		align-items: center;
-		gap: 0.4rem;
-	}
-
-	.param-label {
-		font-size: 0.7rem;
-		font-weight: 500;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.35);
-	}
-
-	.param-hint {
-		font-size: 0.72rem;
-		color: rgba(255, 255, 255, 0.2);
-		line-height: 1.4;
-	}
-
-	.param-range {
-		font-size: 0.65rem;
-		color: rgba(255, 255, 255, 0.15);
-		font-family: 'JetBrains Mono', monospace;
-	}
-
-	.param-warn {
-		font-size: 0.7rem;
-		color: #f0993b;
-		line-height: 1.4;
-		padding: 0.35rem 0.5rem;
-		background: rgba(240, 153, 59, 0.08);
-		border-left: 2px solid rgba(240, 153, 59, 0.3);
-	}
-
-	/* ── Tooltip button & expanded detail ────────────── */
-
-	.tip-btn {
-		width: 16px;
-		height: 16px;
-		border-radius: 50%;
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		background: transparent;
-		color: rgba(255, 255, 255, 0.25);
-		font-size: 0.55rem;
-		font-weight: 700;
-		cursor: pointer;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-		transition: all 0.15s;
-		padding: 0;
-		font-family: 'Inter', sans-serif;
-	}
-
-	.tip-btn:hover {
-		border-color: rgba(255, 255, 255, 0.35);
-		color: rgba(255, 255, 255, 0.6);
-	}
-
-	.tip-expanded {
-		font-size: 0.75rem;
-		line-height: 1.55;
-		color: rgba(255, 255, 255, 0.4);
-		padding: 0.6rem 0.75rem;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.06);
-	}
-
-	.tip-range {
-		display: block;
-		margin-top: 0.35rem;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 0.65rem;
-		color: rgba(255, 255, 255, 0.25);
-	}
-
-	/* ── Input fields ────────────────────────────────── */
-
-	.input-wrap {
-		display: flex;
-		align-items: center;
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		transition: border-color 0.2s;
-	}
-
-	.input-wrap:focus-within {
-		border-color: rgba(255, 255, 255, 0.3);
-	}
-
-	input {
-		flex: 1;
-		background: transparent;
-		border: none;
-		color: #fff;
-		padding: 0.7rem 0.85rem;
-		font-size: 0.9rem;
-		font-family: 'JetBrains Mono', monospace;
-		outline: none;
-		min-width: 0;
-	}
-
-	.input-unit {
-		padding-right: 0.85rem;
-		font-size: 0.7rem;
-		color: rgba(255, 255, 255, 0.25);
-		letter-spacing: 0.05em;
-		white-space: nowrap;
-	}
-
-	/* ── Efficiency preview ──────────────────────────── */
-
-	.efficiency-preview {
-		margin-bottom: 2.5rem;
-		padding: 1.25rem;
-		border: 1px solid rgba(255, 255, 255, 0.06);
-		background: rgba(255, 255, 255, 0.02);
-	}
-
-	.ep-grid {
-		display: flex;
-		gap: 2rem;
-		flex-wrap: wrap;
-	}
-
-	.ep-item {
-		display: flex;
-		flex-direction: column;
-		gap: 0.2rem;
-	}
-
-	.ep-value {
-		font-size: 1.4rem;
-		font-weight: 700;
-		color: #fff;
-	}
-
-	.ep-label {
-		font-size: 0.65rem;
-		font-weight: 500;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		color: rgba(255, 255, 255, 0.25);
-	}
-
-	/* ── Actions ─────────────────────────────────────── */
-
-	.btn-launch {
-		background: #fff;
-		color: #000;
-		border: none;
-		padding: 0.85rem 2.5rem;
-		font-size: 0.85rem;
-		font-weight: 700;
-		font-family: 'Inter', sans-serif;
-		cursor: pointer;
-		letter-spacing: 0.03em;
-		transition: all 0.3s;
-	}
-
-	.btn-launch:hover:not(:disabled) {
-		background: rgba(255, 255, 255, 0.85);
-		transform: translateY(-1px);
-	}
-
-	.btn-launch:disabled {
-		opacity: 0.4;
-		cursor: not-allowed;
-	}
-
-	.status { color: rgba(255, 255, 255, 0.4); }
-	.error { color: #ff3366; margin-bottom: 1rem; }
-
-	/* ── Mobile phase system ─────────────────────────── */
-
-	.mobile-back {
-		display: none;
-	}
-
-	/* ── Responsive ──────────────────────────────────── */
-
-	@media (max-width: 768px) {
-		h1 { font-size: 1.5rem; }
-		.subtitle { font-size: 0.85rem; margin-bottom: 2rem; }
-		.reactor-selector { grid-template-columns: 1fr; }
-		.reactor-option {
-			padding: 1rem;
-		}
-		.param-grid { grid-template-columns: 1fr; gap: 1rem; }
-		.btn-launch { width: 100%; text-align: center; }
-		.section { margin-bottom: 2rem; }
-		.ep-grid { gap: 1.25rem; }
-
-		.mobile-hidden {
-			display: none;
-		}
-
-		.mobile-back {
-			display: inline-flex;
-			align-items: center;
-			gap: 0.35rem;
-			background: none;
-			border: none;
-			color: rgba(255, 255, 255, 0.4);
-			font-size: 0.8rem;
-			font-family: 'Inter', sans-serif;
-			cursor: pointer;
-			padding: 0;
-			margin-bottom: 1.5rem;
-			transition: color 0.2s;
-		}
-
-		.mobile-back:hover {
-			color: #fff;
-		}
-	}
-</style>
+{#snippet paramField(key: string, label: string, value: number, setValue: (v: number) => void, min?: number, max?: number, unit?: string)}
+	<label class="flex flex-col gap-1">
+		<div class="flex items-center gap-1.5">
+			<span class="text-[0.7rem] font-medium tracking-nav uppercase text-white/35">{label}</span>
+			<button type="button" class="w-4 h-4 rounded-full border border-white/15 bg-transparent text-white/25 text-[0.55rem] font-bold cursor-pointer inline-flex items-center justify-center shrink-0 transition-all duration-150 p-0 font-sans hover:border-white/35 hover:text-white/60" onclick={() => toggleTip(key)} aria-label="More info">?</button>
+		</div>
+		<span class="text-[0.72rem] text-white/35 leading-snug">{PARAM_META[key].short}</span>
+		{#if activeTooltip === key}
+			<div class="text-xs leading-relaxed text-white/40 px-3 py-2.5 bg-white/3 border border-white/6">
+				{PARAM_META[key].detail}
+				<span class="block mt-1.5 font-mono text-[0.65rem] text-white/25">Typical: {PARAM_META[key].typicalRange}</span>
+			</div>
+		{/if}
+		<div class="flex items-center border border-white/10 transition-colors duration-200 focus-within:border-white/30">
+			<input type="number" {value} oninput={(e) => setValue(Number((e.target as HTMLInputElement).value))} min={min} max={max} step="any" required class="flex-1 bg-transparent border-none text-white py-3 px-3.5 text-[0.9rem] font-mono outline-none min-w-0" />
+			{#if unit}
+				<span class="pr-3.5 text-[0.7rem] text-white/25 tracking-[0.05em] whitespace-nowrap">{unit}</span>
+			{/if}
+		</div>
+		<span class="text-[0.65rem] text-white/35 font-mono">Typical: {PARAM_META[key].typicalRange}</span>
+		{#if warnings[key]}
+			<span class="text-[0.7rem] text-[#f0993b] leading-snug py-1.5 px-2 bg-[rgba(240,153,59,0.08)] border-l-2 border-[rgba(240,153,59,0.3)]">{warnings[key]}</span>
+		{/if}
+	</label>
+{/snippet}
