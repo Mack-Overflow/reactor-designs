@@ -642,6 +642,7 @@
 						y: {
 							...BASE_CHART_OPTIONS.scales.y,
 							type: 'logarithmic',
+							title: { display: true, text: 'Activity (Bq)', color: 'rgba(255,255,255,0.3)', font: { size: 10, family: 'Inter' } },
 							ticks: {
 								color: 'rgba(255,255,255,0.2)',
 								font: { size: 10, family: 'JetBrains Mono' },
