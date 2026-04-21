@@ -52,10 +52,11 @@ pub async fn run() -> std::io::Result<()> {
 
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let host = std::env::var("API_HOST").unwrap_or_else(|_| "0.0.0.0".to_string());
-    let port: u16 = std::env::var("API_PORT")
+    let port: u16 = std::env::var("PORT")
+        .or_else(|_| std::env::var("API_PORT"))
         .unwrap_or_else(|_| "8080".to_string())
         .parse()
-        .expect("API_PORT must be a valid port number");
+        .expect("PORT/API_PORT must be a valid port number");
 
     let manager = ConnectionManager::<PgConnection>::new(&database_url);
     let pool = r2d2::Pool::builder()
