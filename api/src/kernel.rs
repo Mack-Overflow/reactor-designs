@@ -13,8 +13,17 @@ pub async fn health() -> HttpResponse {
 
 fn run_migrations(pool: &crate::DbPool) {
     let mut conn = pool.get().expect("Failed to get DB connection for migrations");
-    conn.run_pending_migrations(MIGRATIONS)
-        .expect("Failed to run database migrations");
+    log::info!("Running database migrations...");
+    match conn.run_pending_migrations(MIGRATIONS) {
+        Ok(applied) if applied.is_empty() => log::info!("No pending migrations"),
+        Ok(applied) => {
+            log::info!("Applied {} migration(s):", applied.len());
+            for m in applied {
+                log::info!("  - {}", m);
+            }
+        }
+        Err(e) => panic!("Failed to run database migrations: {}", e),
+    }
 }
 
 fn spawn_pruner(pool: crate::DbPool) {
