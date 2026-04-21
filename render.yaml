@@ -30,14 +30,11 @@ services:
     name: reactor-ui
     runtime: static
     rootDir: ui
-    buildCommand: npm ci && VITE_API_URL="https://$API_HOSTNAME" npm run build
+    buildCommand: npm ci && npm run build
     staticPublishPath: ./build
     envVars:
-      - key: API_HOSTNAME
-        fromService:
-          type: web
-          name: reactor-api
-          property: host
+      - key: VITE_API_URL
+        sync: false
     routes:
       - type: rewrite
         source: /*
